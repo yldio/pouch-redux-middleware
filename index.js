@@ -36,7 +36,7 @@ function createPouchMiddleware(_paths) {
     spec.actions = extend({}, defaultSpec.actions, spec.actions);
 
     if (! spec.db) {
-      throw new Error('path ' + path.pth + ' needs a db:')
+      throw new Error('path ' + path.pth + ' needs a db');
     }
     return spec;
   });
@@ -48,6 +48,8 @@ function createPouchMiddleware(_paths) {
 
   function processNewStateForPath(path, state) {
     var docs = jPath.resolve(state, path.path);
+
+    /* istanbul ignore else */
     if (docs && docs.length) {
       docs.forEach(function(docs) {
         var diffs = differences(path.docs, docs);
@@ -110,6 +112,8 @@ function differences(oldDocs, newDocs) {
 
   newDocs.forEach(function(newDoc) {
     var id = newDoc._id;
+
+    /* istanbul ignore next */
     if (! id) {
       warn('doc with no id');
     }
@@ -143,6 +147,7 @@ function onDbChange(path, change) {
   }
 }
 
+/* istanbul ignore next */
 function warn(what) {
   var fn = console.warn || console.log;
   if (fn) {
@@ -150,6 +155,7 @@ function warn(what) {
   }
 }
 
+/* istanbul ignore next */
 function defaultAction(action) {
   return function() {
     throw new Error('no action provided for ' + action);

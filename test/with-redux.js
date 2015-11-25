@@ -44,7 +44,7 @@ describe('Pouch Redux Middleware', function() {
     done();
   });
 
-  it('accepts a few changes', function(done) {
+  it('accepts a few inserts', function(done) {
     store.dispatch({type: actionTypes.ADD_TODO, text: 'do laundry', id: 'a'});
     store.dispatch({type: actionTypes.ADD_TODO, text: 'wash dishes', id: 'b'});
     timers.setTimeout(done, 100);
@@ -87,4 +87,61 @@ describe('Pouch Redux Middleware', function() {
       done();
     });
   });
+
+  it('making changes in pouchdb...', function(done) {
+    db.get('b', function(err, doc) {
+      expect(err).to.equal(null);
+      doc.text = 'wash some of the dishes';
+      db.put(doc, done);
+    });
+  });
+
+  it('waiting a bit', function(done) {
+    timers.setTimeout(done, 100);
+  });
+
+  it('...propagates update from pouchdb', function(done) {
+    expect(store.getState().todos.filter(function(doc) {
+      return doc._id == 'b';
+    })[0].text).to.equal('wash some of the dishes');
+    done();
+  });
+
+  it('making removal in pouchdb...', function(done) {
+    db.get('b', function(err, doc) {
+      expect(err).to.equal(null);
+      db.remove(doc, done);
+    });
+  });
+
+  it('waiting a bit', function(done) {
+    timers.setTimeout(done, 100);
+  });
+
+  it('...propagates update from pouchdb', function(done) {
+    expect(store.getState().todos.filter(function(doc) {
+      return doc._id == 'b';
+    }).length).to.equal(0);
+    done();
+  });
+
+  it('making insert in pouchdb...', function(done) {
+    db.post({
+      _id: 'c',
+      text: 'pay bills',
+    }, done);
+  });
+
+  it('waiting a bit', function(done) {
+    timers.setTimeout(done, 100);
+  });
+
+  it('...propagates update from pouchdb', function(done) {
+    expect(store.getState().todos.filter(function(doc) {
+      return doc._id == 'c';
+    })[0].text).to.equal('pay bills');
+    done();
+  });
+
+
 });
