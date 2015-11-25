@@ -60,7 +60,7 @@ describe('Pouch Redux Middleware', function() {
     });
   });
 
-  it('accepts a few more changes', function(done) {
+  it('accepts an edit', function(done) {
     store.dispatch({type: actionTypes.EDIT_TODO, text: 'wash all the dishes', id: 'b'});
     timers.setTimeout(done, 100);
   });
@@ -75,4 +75,16 @@ describe('Pouch Redux Middleware', function() {
     });
   });
 
+  it('accepts an removal', function(done) {
+    store.dispatch({type: actionTypes.DELETE_TODO, id: 'a'});
+    timers.setTimeout(done, 100);
+  });
+
+  it('saves changes in pouchdb', function(done) {
+    db.get('a', function(err) {
+      expect(err).to.be.an.object();
+      expect(err.message).to.equal('missing');
+      done();
+    });
+  });
 });
