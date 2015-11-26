@@ -1,5 +1,8 @@
 # pouch-redux-middleware
 
+[![By](https://img.shields.io/badge/made%20by-yld!-32bbee.svg?style=flat)](http://yld.io/contact?source=github-pouch-redux-middleware)
+[![Build Status](https://secure.travis-ci.org/pgte/pouch-redux-middleware.svg?branch=master)](http://travis-ci.org/pgte/pouch-redux-middleware?branch=master)
+
 Redux Middleware for syncing state and a PouchDB database.
 
 Propagates state changes into PouchDB.
