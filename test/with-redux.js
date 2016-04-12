@@ -33,7 +33,8 @@ describe('Pouch Redux Middleware', function() {
         remove: doc => store.dispatch({type: actionTypes.DELETE_TODO, id: doc._id}),
         insert: doc => store.dispatch({type: actionTypes.INSERT_TODO, todo: doc}),
         update: doc => store.dispatch({type: actionTypes.UPDATE_TODO, todo: doc}),
-      }
+      },
+      changeFilter: doc => !doc.filter
     });
     done();
   });
@@ -143,5 +144,22 @@ describe('Pouch Redux Middleware', function() {
     done();
   });
 
+  it('...inserts filtered document', function(done) {
+    db.post({
+      _id: 'd',
+      filter: true,
+    }).then(() => done()).catch(done);
+  });
+
+  it('waiting a bit', function(done) {
+    timers.setTimeout(done, 100);
+  });
+
+  it('...filters documents', function(done) {
+    expect(store.getState().todos.filter(function(doc) {
+      return doc._id == 'd';
+    }).length).to.equal(0);
+    done();
+  });
 
 });
