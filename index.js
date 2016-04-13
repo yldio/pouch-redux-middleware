@@ -28,12 +28,14 @@ function createPouchMiddleware(_paths) {
       remove: defaultAction('remove'),
       update: defaultAction('update'),
       insert: defaultAction('insert')
-    }
+    },
+    changeFilter: doc => true
   }
 
   paths = paths.map(function(path) {
     var spec = extend({}, defaultSpec, path);
     spec.actions = extend({}, defaultSpec.actions, spec.actions);
+    spec.docs = {};
 
     if (! spec.db) {
       throw new Error('path ' + path.pth + ' needs a db');
@@ -131,6 +133,11 @@ function differences(oldDocs, newDocs) {
 
 function onDbChange(path, change) {
   var changeDoc = change.doc;
+
+  if(! path.changeFilter(changeDoc)) {
+    return;
+  }
+
   if (changeDoc._deleted) {
     if (path.docs[changeDoc._id]) {
       delete path.docs[changeDoc._id];

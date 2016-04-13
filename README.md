@@ -39,15 +39,6 @@ export default function configureStore() {
   })
   const createStoreWithMiddleware = applyMiddleware(pouchMiddleware)(createStore)
   const store = createStoreWithMiddleware(rootReducer)
-
-  if (module.hot) {
-    // Enable Webpack hot module replacement for reducers
-    module.hot.accept('../reducers', () => {
-      const nextReducer = require('../reducers')
-      store.replaceReducer(nextReducer)
-    })
-  }
-
   return store
 }
 ```
@@ -62,7 +53,11 @@ A path spec is an object describing the behaviour of a sub-tree of the state it 
 
 * `path`: a JsonPath path where the documents will stored in the state as an array
 * `db`: a PouchDB database
-* `actions`: an object describing the actions to perform when a change in the Po. It's an object containing a function that returns an action for each of the events (`remove`, `insert` and `update`) 
+* `actions`: an object describing the actions to perform when a change in the Po. It's an object containing a function that returns an action for each of the events (`remove`, `insert` and `update`)
+* `changeFilter`: a function that receives a changed document, and if it returns
+false, the document will be ignored for the path. This is useful when you have
+multiple paths in a single database that are differentiated through an attribute
+(like `type`).
 
 Example of a path spec:
 
