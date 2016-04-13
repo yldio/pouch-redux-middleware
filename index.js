@@ -28,8 +28,7 @@ function createPouchMiddleware(_paths) {
       remove: defaultAction('remove'),
       update: defaultAction('update'),
       insert: defaultAction('insert')
-    },
-    changeFilter: doc => true
+    }
   }
 
   paths = paths.map(function(path) {
@@ -134,7 +133,7 @@ function differences(oldDocs, newDocs) {
 function onDbChange(path, change) {
   var changeDoc = change.doc;
 
-  if(! path.changeFilter(changeDoc)) {
+  if(path.changeFilter && (! path.changeFilter(changeDoc))) {
     return;
   }
 
