@@ -24,6 +24,7 @@ function createPouchMiddleware(_paths) {
     propagateInsert,
     queue: Queue(1),
     docs: {},
+    changesSince: false,
     actions: {
       remove: defaultAction('remove'),
       update: defaultAction('update'),
@@ -34,7 +35,15 @@ function createPouchMiddleware(_paths) {
   paths = paths.map(function(path) {
     var spec = extend({}, defaultSpec, path);
     spec.actions = extend({}, defaultSpec.actions, spec.actions);
-    spec.docs = {};
+
+    if(path.docs) {
+      spec.docs = path.docs.reduce((docs, doc) => {
+        docs[doc._id] = doc;
+        return docs;
+      }, {});
+    } else {
+      spec.docs = {};
+    }
 
     if (! spec.db) {
       throw new Error('path ' + path.pth + ' needs a db');
@@ -43,7 +52,11 @@ function createPouchMiddleware(_paths) {
   });
 
   function listen(path) {
-    var changes = path.db.changes({live: true, include_docs: true});
+    var changes = path.db.changes({
+      live: true,
+      include_docs: true,
+      since: path.changesSince
+    });
     changes.on('change', change => onDbChange(path, change));
   }
 
