@@ -19,7 +19,7 @@ var db = new PouchDB('todos', {
 
 var redux = require('redux');
 
-var PouchMiddleware = require('../');
+var PouchMiddleware = require('../src/');
 
 describe('Pouch Redux Middleware', function() {
   var pouchMiddleware;
