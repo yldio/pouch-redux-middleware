@@ -60,11 +60,23 @@ function createPouchMiddleware(_paths) {
     }
   }
 
+  function updateRef(doc, cb) {
+    return function(err, resp) {
+      /* istanbul ignore next */
+      if (err) {
+        return cb(err);
+      }
+
+      doc._rev = resp.rev;
+      cb(err, resp);
+    }
+  }
+
   function scheduleInsert(doc) {
     this.docs[doc._id] = doc;
     var db = this.db;
     this.queue.push(function(cb) {
-      db.put(doc, cb);
+      db.put(doc, updateRef(doc, cb));
     });
   }
 
@@ -72,7 +84,7 @@ function createPouchMiddleware(_paths) {
     delete this.docs[doc._id];
     var db = this.db;
     this.queue.push(function(cb) {
-      db.remove(doc, cb);
+      db.remove(doc, updateRef(doc, cb));
     });
   }
 

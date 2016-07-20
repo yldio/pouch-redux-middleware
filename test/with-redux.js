@@ -61,6 +61,18 @@ describe('Pouch Redux Middleware', function() {
     });
   });
 
+  it('can re-insert the same doc again', function(done) {
+    var docB = store.getState().todos.find(function(doc) {
+      return doc._id === 'b';
+    });
+
+    store.dispatch({type: actionTypes.DELETE_TODO, id: 'b'});
+    store.dispatch({type: actionTypes.INSERT_TODO, todo: docB});
+    store.dispatch({type: actionTypes.DELETE_TODO, id: 'b'});
+    store.dispatch({type: actionTypes.INSERT_TODO, todo: docB});
+    timers.setTimeout(done, 100);
+  });
+
   it('accepts an edit', function(done) {
     store.dispatch({type: actionTypes.EDIT_TODO, text: 'wash all the dishes', id: 'b'});
     timers.setTimeout(done, 100);
