@@ -22,6 +22,7 @@ function createPouchMiddleware(_paths) {
     propagateDelete,
     propagateUpdate,
     propagateInsert,
+    handleResponse: function(err, data, cb) { cb(err); },
     queue: Queue(1),
     docs: {},
     actions: {
@@ -60,20 +61,46 @@ function createPouchMiddleware(_paths) {
     }
   }
 
+  function write(data, responseHandler) {
+    return function(done) {
+      data.db[data.type](data.doc, function(err, resp) {
+        responseHandler(
+          err,
+          {
+            response: resp,
+            doc: data.doc,
+            type: data.type
+          },
+          function(err2) {
+            done(err2, resp);
+          }
+        );
+      });
+    };
+  }
+
   function scheduleInsert(doc) {
     this.docs[doc._id] = doc;
-    var db = this.db;
-    this.queue.push(function(cb) {
-      db.put(doc, cb);
-    });
+    this.queue.push(write(
+      {
+        type: 'put',
+        doc: doc,
+        db: this.db
+      },
+      this.handleResponse
+    ));
   }
 
   function scheduleRemove(doc) {
     delete this.docs[doc._id];
-    var db = this.db;
-    this.queue.push(function(cb) {
-      db.remove(doc, cb);
-    });
+    this.queue.push(write(
+      {
+        type: 'remove',
+        doc: doc,
+        db: this.db
+      },
+      this.handleResponse
+    ));
   }
 
   function propagateDelete(doc) {
