@@ -42,9 +42,9 @@ function createPouchMiddleware(_paths) {
     return spec;
   });
 
-  function listen(path) {
+  function listen(path, dispatch) {
     var changes = path.db.changes({live: true, include_docs: true});
-    changes.on('change', change => onDbChange(path, change));
+    changes.on('change', change => onDbChange(path, change, dispatch));
   }
 
   function processNewStateForPath(path, state) {
@@ -76,20 +76,20 @@ function createPouchMiddleware(_paths) {
     });
   }
 
-  function propagateDelete(doc) {
-    this.actions.remove(doc);
+  function propagateDelete(doc, dispatch) {
+    dispatch(this.actions.remove(doc));
   }
 
-  function propagateInsert(doc) {
-    this.actions.insert(doc);
+  function propagateInsert(doc, dispatch) {
+    dispatch(this.actions.insert(doc));
   }
 
-  function propagateUpdate(doc) {
-    this.actions.update(doc);
+  function propagateUpdate(doc, dispatch) {
+    dispatch(this.actions.update(doc));
   }
 
   return function(options) {
-    paths.forEach(listen);
+    paths.forEach((path) => listen(path, options.dispatch));
 
     return function(next) {
       return function(action) {
@@ -130,7 +130,7 @@ function differences(oldDocs, newDocs) {
   return result;
 }
 
-function onDbChange(path, change) {
+function onDbChange(path, change, dispatch) {
   var changeDoc = change.doc;
 
   if(path.changeFilter && (! path.changeFilter(changeDoc))) {
@@ -140,15 +140,15 @@ function onDbChange(path, change) {
   if (changeDoc._deleted) {
     if (path.docs[changeDoc._id]) {
       delete path.docs[changeDoc._id];
-      path.propagateDelete(changeDoc);
+      path.propagateDelete(changeDoc, dispatch);
     }
   } else {
     var oldDoc = path.docs[changeDoc._id];
     path.docs[changeDoc._id] = changeDoc;
     if (oldDoc) {
-      path.propagateUpdate(changeDoc);
+      path.propagateUpdate(changeDoc, dispatch);
     } else {
-      path.propagateInsert(changeDoc);
+      path.propagateInsert(changeDoc, dispatch);
     }
   }
 }
