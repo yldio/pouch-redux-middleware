@@ -37,7 +37,7 @@ function createPouchMiddleware(_paths) {
     spec.docs = {};
 
     if (! spec.db) {
-      throw new Error('path ' + path.pth + ' needs a db');
+      throw new Error('path ' + path.path + ' needs a db');
     }
     return spec;
   });
