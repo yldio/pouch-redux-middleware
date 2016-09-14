@@ -32,13 +32,18 @@ export default function configureStore() {
     path: '/todos',
     db,
     actions: {
-      remove: doc => store.dispatch({type: types.DELETE_TODO, id: doc._id}),
-      insert: doc => store.dispatch({type: types.INSERT_TODO, todo: doc}),
-      update: doc => store.dispatch({type: types.UPDATE_TODO, todo: doc}),
+      remove: doc => { return { type: types.DELETE_TODO, id: doc._id } },
+      insert: doc => { return { type: types.INSERT_TODO, todo: doc } },
+      update: doc => { return { type: types.UPDATE_TODO, todo: doc } },
     }
   })
-  const createStoreWithMiddleware = applyMiddleware(pouchMiddleware)(createStore)
-  const store = createStoreWithMiddleware(rootReducer)
+
+  const store = createStore(
+    rootReducer,
+    undefined,
+    applyMiddleware(pouchMiddleware)
+  )
+
   return store
 }
 ```
@@ -66,9 +71,9 @@ Example of a path spec:
   path: '/todos',
   db,
   actions: {
-    remove: doc => store.dispatch({type: types.DELETE_TODO, id: doc._id}),
-    insert: doc => store.dispatch({type: types.INSERT_TODO, todo: doc}),
-    update: doc => store.dispatch({type: types.UPDATE_TODO, todo: doc}),
+    remove: doc => { return { type: types.DELETE_TODO, id: doc._id } },
+    insert: doc => { return { type: types.INSERT_TODO, todo: doc } },
+    update: doc => { return { type: types.UPDATE_TODO, todo: doc } },
   }
 }
 ```

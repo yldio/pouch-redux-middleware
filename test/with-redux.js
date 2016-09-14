@@ -30,9 +30,9 @@ describe('Pouch Redux Middleware', function() {
       path: '/todos',
       db: db,
       actions: {
-        remove: doc => store.dispatch({type: actionTypes.DELETE_TODO, id: doc._id}),
-        insert: doc => store.dispatch({type: actionTypes.INSERT_TODO, todo: doc}),
-        update: doc => store.dispatch({type: actionTypes.UPDATE_TODO, todo: doc}),
+        remove: (doc) => { return {type: actionTypes.DELETE_TODO, id: doc._id} },
+        insert: (doc) => { return {type: actionTypes.INSERT_TODO, todo: doc} },
+        update: (doc) => { return {type: actionTypes.UPDATE_TODO, todo: doc} }
       },
       changeFilter: doc => !doc.filter
     });
