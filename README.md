@@ -58,6 +58,10 @@ A path spec is an object describing the behaviour of a sub-tree of the state it 
 false, the document will be ignored for the path. This is useful when you have
 multiple paths in a single database that are differentiated through an attribute
 (like `type`).
+* `handleResponse` a function that is invoked with the direct response of the database,
+which is useful when metadata is needed or errors need custom handling.
+Arguments are `error, data, callback`. `callback` must be invoked with a potential error
+after custom handling is done.
 
 Example of a path spec:
 
