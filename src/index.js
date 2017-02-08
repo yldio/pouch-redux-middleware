@@ -43,9 +43,23 @@ function createPouchMiddleware(_paths) {
     return spec;
   });
 
-  function listen(path, dispatch) {
-    var changes = path.db.changes({live: true, include_docs: true});
-    changes.on('change', change => onDbChange(path, change, dispatch));
+  function listen(path, dispatch, initialBatchDispatched) {
+    path.db.info().then((info) => {
+      if (info.update_seq === 0) {
+        initialBatchDispatched();
+      }
+
+      const changes = path.db.changes({
+        live: true,
+        include_docs: true
+      });
+      changes.on('change', change => {
+        onDbChange(path, change, dispatch);
+        if (change.seq === info.update_seq) {
+          initialBatchDispatched();
+        }
+      });
+    });
   }
 
   function processNewStateForPath(path, state) {
@@ -116,7 +130,13 @@ function createPouchMiddleware(_paths) {
   }
 
   return function(options) {
-    paths.forEach((path) => listen(path, options.dispatch));
+    paths.forEach((path) => {
+      listen(path, options.dispatch, (err) => {
+        if (path.initialBatchDispatched) {
+          path.initialBatchDispatched(err);
+        }
+      });
+    });
 
     return function(next) {
       return function(action) {
