@@ -176,7 +176,7 @@ describe('Pouch Redux Middleware', function() {
           return done(err);
         }
 
-        let called = false;
+        var called = false;
         store.subscribe(() => {
           if (called) {
             done(new Error('expect subscribe to only be called once'));
