@@ -162,4 +162,35 @@ describe('Pouch Redux Middleware', function() {
     done();
   });
 
+  it('calles initialBatchDispatched', (done) => {
+    const anotherMiddleware = PouchMiddleware({
+      path: '/todos',
+      db: db,
+      actions: {
+        remove: (doc) => { return {type: actionTypes.DELETE_TODO, id: doc._id} },
+        insert: (doc) => { return {type: actionTypes.INSERT_TODO, todo: doc} },
+        update: (doc) => { return {type: actionTypes.UPDATE_TODO, todo: doc} }
+      },
+      initialBatchDispatched(err) {
+        if (err) {
+          return done(err);
+        }
+
+        var called = false;
+        store.subscribe(() => {
+          if (called) {
+            done(new Error('expect subscribe to only be called once'));
+          }
+          called = true;
+          expect(store.getState().todos.length).to.equal(1);
+          timers.setTimeout(done, 100);
+        });
+
+        expect(store.getState().todos.length).to.equal(2);
+        store.dispatch({type: actionTypes.DELETE_TODO, id: 'c'});
+      }
+    });
+    const store = redux.applyMiddleware(anotherMiddleware)(redux.createStore)(rootReducer);
+    expect(store.getState().todos.length).to.equal(0);
+  });
 });
