@@ -1,6 +1,6 @@
 {
   "name": "pouch-redux-middleware",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "PouchDB Redux Middleware",
   "main": "lib/index.js",
   "scripts": {
