@@ -22,13 +22,15 @@ function createPouchMiddleware(_paths) {
     propagateDelete,
     propagateUpdate,
     propagateInsert,
+    propagateBatchInsert,
     handleResponse: function(err, data, cb) { cb(err); },
     queue: Queue(1),
     docs: {},
     actions: {
       remove: defaultAction('remove'),
       update: defaultAction('update'),
-      insert: defaultAction('insert')
+      insert: defaultAction('insert'),
+      batchInsert: defaultAction('batchInsert'),
     }
   }
 
@@ -44,20 +46,24 @@ function createPouchMiddleware(_paths) {
   });
 
   function listen(path, dispatch, initialBatchDispatched) {
-    path.db.info().then((info) => {
-      if (info.update_seq === 0) {
-        initialBatchDispatched();
+    path.db.allDocs({ include_docs: true }).then(({ rows }) => {
+      const allDocs = rows.map(({ doc }) => doc);
+      let filteredAllDocs = allDocs;
+      if (path.changeFilter) {
+        filteredAllDocs = allDocs.filter(path.changeFilter);
       }
-
+      allDocs.forEach((doc) => {
+        path.docs[doc._id] = doc;
+      });
+      path.propagateBatchInsert(filteredAllDocs, dispatch);
+      initialBatchDispatched();
       const changes = path.db.changes({
         live: true,
-        include_docs: true
+        include_docs: true,
+        since: 'now',
       });
       changes.on('change', change => {
         onDbChange(path, change, dispatch);
-        if (change.seq === info.update_seq) {
-          initialBatchDispatched();
-        }
       });
     });
   }
@@ -127,6 +133,10 @@ function createPouchMiddleware(_paths) {
 
   function propagateUpdate(doc, dispatch) {
     dispatch(this.actions.update(doc));
+  }
+
+  function propagateBatchInsert(docs, dispatch) {
+    dispatch(this.actions.batchInsert(docs));
   }
 
   return function(options) {

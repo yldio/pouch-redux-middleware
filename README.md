@@ -42,6 +42,7 @@ export default function configureStore() {
     actions: {
       remove: doc => { return { type: types.DELETE_TODO, id: doc._id } },
       insert: doc => { return { type: types.INSERT_TODO, todo: doc } },
+      batchInsert: docs => { return { type: types.BATCH_INSERT_TODOS, todos: docs } }
       update: doc => { return { type: types.UPDATE_TODO, todo: doc } },
     }
   })
@@ -66,9 +67,9 @@ A path spec is an object describing the behaviour of a sub-tree of the state it 
 
 * `path`: a JsonPath path where the documents will stored in the state as an array
 * `db`: a PouchDB database
-* `actions`: an object describing the actions to perform when a change occurs in the db.
+* `actions`: an object describing the actions to perform when initially inserting items and when a change occurs in the db.
 It's an object with keys containing a function that returns an action for each
-of the events (`remove`, `insert` and `update`)
+of the events (`remove`, `insert`, `batchInsert` and `update`)
 * `changeFilter`: a filtering function that receives a changed document, and if it returns
 false, the document will be ignored for the path. This is useful when you have
 multiple paths in a single database that are differentiated through an attribute
@@ -93,6 +94,7 @@ Example of a path spec:
   actions: {
     remove: doc => { return { type: types.DELETE_TODO, id: doc._id } },
     insert: doc => { return { type: types.INSERT_TODO, todo: doc } },
+    batchInsert: docs => { return { type: types.BATCH_INSERT_TODOS, todos: docs } }
     update: doc => { return { type: types.UPDATE_TODO, todo: doc } },
   }
 }

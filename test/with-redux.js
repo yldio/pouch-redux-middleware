@@ -32,6 +32,7 @@ describe('Pouch Redux Middleware', function() {
       actions: {
         remove: (doc) => { return {type: actionTypes.DELETE_TODO, id: doc._id} },
         insert: (doc) => { return {type: actionTypes.INSERT_TODO, todo: doc} },
+        batchInsert: (docs) => { return {type: actionTypes.BATCH_INSERT_TODOS, todos: docs} },
         update: (doc) => { return {type: actionTypes.UPDATE_TODO, todo: doc} }
       },
       changeFilter: doc => !doc.filter
@@ -169,6 +170,7 @@ describe('Pouch Redux Middleware', function() {
       actions: {
         remove: (doc) => { return {type: actionTypes.DELETE_TODO, id: doc._id} },
         insert: (doc) => { return {type: actionTypes.INSERT_TODO, todo: doc} },
+        batchInsert: (docs) => { return {type: actionTypes.BATCH_INSERT_TODOS, todos: docs} },
         update: (doc) => { return {type: actionTypes.UPDATE_TODO, todo: doc} }
       },
       initialBatchDispatched(err) {
