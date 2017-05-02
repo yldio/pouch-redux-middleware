@@ -180,7 +180,7 @@ function differences(oldDocs, newDocs) {
 function onDbChange(path, change, dispatch) {
   var changeDoc = change.doc;
 
-  if(!changeDoc._deleted && path.changeFilter && (! path.changeFilter(changeDoc))) {
+  if(path.changeFilter && (! path.changeFilter(changeDoc))) {
     return;
   }
 
