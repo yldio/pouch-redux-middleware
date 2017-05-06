@@ -46,9 +46,9 @@ function createPouchMiddleware(_paths) {
   });
 
   function listen(path, dispatch, initialBatchDispatched) {
-    path.db.allDocs({ include_docs: true }).then(({ rows }) => {
-      const allDocs = rows.map(({ doc }) => doc);
-      let filteredAllDocs = allDocs;
+    path.db.allDocs({ include_docs: true }).then((rawAllDocs) => {
+      var allDocs = rawAllDocs.rows.map((doc) => doc.doc);
+      var filteredAllDocs = allDocs;
       if (path.changeFilter) {
         filteredAllDocs = allDocs.filter(path.changeFilter);
       }
@@ -57,7 +57,7 @@ function createPouchMiddleware(_paths) {
       });
       path.propagateBatchInsert(filteredAllDocs, dispatch);
       initialBatchDispatched();
-      const changes = path.db.changes({
+      var changes = path.db.changes({
         live: true,
         include_docs: true,
         since: 'now',
