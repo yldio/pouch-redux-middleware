@@ -23,7 +23,8 @@ module.exports = function todos(state, action) {
         action.todo,
         ...state
       ]
-
+    case actionTypes.BATCH_INSERT_TODOS:
+      return [...state, ...action.todos]
     case actionTypes.DELETE_TODO:
       return state.filter(todo =>
         todo._id !== action.id
