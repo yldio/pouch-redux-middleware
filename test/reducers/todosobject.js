@@ -20,7 +20,7 @@ module.exports = function todosobject(state, action) {
     case actionTypes.INSERT_TODO:
       return Object.assign(state, { [action.todo._id]: action.todo  });
     case actionTypes.DELETE_TODO:
-      let newState = Object.assign({}, state);
+      var newState = Object.assign({}, state);
       delete newState[action.id];
       return newState;
 
