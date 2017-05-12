@@ -168,7 +168,7 @@ function differences(oldDocs, newDocs) {
     deleted: Object.keys(oldDocs).map(oldDocId => oldDocs[oldDocId]),
   };
 
-  newDocs.forEach(function(newDoc) {
+  var checkDoc = function(newDoc) {
     var id = newDoc._id;
 
     /* istanbul ignore next */
@@ -182,7 +182,19 @@ function differences(oldDocs, newDocs) {
     } else if (!equal(oldDoc, newDoc)) {
       result.updated.push(newDoc);
     }
-  });
+  };
+
+  if (Array.isArray(newDocs)){
+    newDocs.forEach(function (doc) {
+      checkDoc(doc)
+    });
+  } else{
+    var keys = Object.keys(newDocs);
+    for (var key in newDocs){
+      checkDoc(newDocs[key])
+    }
+  }
+
 
   return result;
 }
