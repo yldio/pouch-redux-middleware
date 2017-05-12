@@ -10,7 +10,7 @@ module.exports = function todosobject(state, action) {
   switch (action.type) {
     case actionTypes.ADD_TODO:
     {
-      let todo = {
+      var todo = {
         _id: action.id || id(),
         completed: false,
         text: action.text
