@@ -26,6 +26,7 @@ describe('Pouch Redux Middleware', function() {
   var store;
 
   it('can be created', function(done) {
+    
     pouchMiddleware = PouchMiddleware({
       path: '/todos',
       db: db,
