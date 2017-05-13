@@ -52,7 +52,7 @@ function createPouchMiddleware(_paths) {
       if (path.changeFilter) {
         filteredAllDocs = allDocs.filter(path.changeFilter);
       }
-      allDocs.forEach((doc) => {
+      filteredAllDocs.forEach((doc) => {
         path.docs[doc._id] = doc;
       });
       path.propagateBatchInsert(filteredAllDocs, dispatch);
