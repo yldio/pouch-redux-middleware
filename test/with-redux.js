@@ -19,14 +19,14 @@ var db = new PouchDB('todos', {
 
 var redux = require('redux');
 
-var PouchMiddleware = require('../src/');
+var PouchMiddleware = require('../lib/');
 
 describe('Pouch Redux Middleware', function() {
   var pouchMiddleware;
   var store;
 
   it('can be created', function(done) {
-    
+
     pouchMiddleware = PouchMiddleware({
       path: '/todos',
       db: db,

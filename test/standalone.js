@@ -7,7 +7,7 @@ var it = lab.it;
 var Code = require('code');
 var expect = Code.expect;
 
-var PouchMiddleware = require('../src/');
+var PouchMiddleware = require('../lib/');
 
 var PouchDB = require('pouchdb');
 var db = new PouchDB('todos', {
