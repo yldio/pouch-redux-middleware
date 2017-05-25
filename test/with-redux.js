@@ -36,7 +36,7 @@ describe('Pouch Redux Middleware', function() {
         batchInsert: (docs) => { return {type: actionTypes.BATCH_INSERT_TODOS, todos: docs} },
         update: (doc) => { return {type: actionTypes.UPDATE_TODO, todo: doc} }
       },
-      changeFilter: doc => !doc.filter
+      changeFilter: doc => doc.filter == false
     });
     done();
   });
