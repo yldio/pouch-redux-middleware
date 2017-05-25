@@ -164,7 +164,7 @@ describe('Pouch Redux Middleware', function() {
     done();
   });
 
-  it('calles initialBatchDispatched', (done) => {
+  it('calls initialBatchDispatched', (done) => {
     const anotherMiddleware = PouchMiddleware({
       path: '/todos',
       db: db,
@@ -191,6 +191,24 @@ describe('Pouch Redux Middleware', function() {
 
         expect(store.getState().todos.length).to.equal(2);
         store.dispatch({type: actionTypes.DELETE_TODO, id: 'c'});
+      }
+    });
+    const store = redux.applyMiddleware(anotherMiddleware)(redux.createStore)(rootReducer);
+    expect(store.getState().todos.length).to.equal(0);
+  });
+  it('calls initialBatchDispatched with an error if db.allDocs throws', (done) => {
+    const anotherMiddleware = PouchMiddleware({
+      path: '/todos',
+      db: ({ allDocs: () => Promise.reject(new Error('Some PouchDB error')) }),
+      actions: {
+        remove: (doc) => { return {type: actionTypes.DELETE_TODO, id: doc._id} },
+        insert: (doc) => { return {type: actionTypes.INSERT_TODO, todo: doc} },
+        batchInsert: (docs) => { return {type: actionTypes.BATCH_INSERT_TODOS, todos: docs} },
+        update: (doc) => { return {type: actionTypes.UPDATE_TODO, todo: doc} }
+      },
+      initialBatchDispatched(err) {
+        expect(err).to.equal(new Error('Some PouchDB error'));
+        done();
       }
     });
     const store = redux.applyMiddleware(anotherMiddleware)(redux.createStore)(rootReducer);
