@@ -65,7 +65,7 @@ function createPouchMiddleware(_paths) {
       changes.on('change', change => {
         onDbChange(path, change, dispatch);
       });
-    });
+    }).catch((err) => initialBatchDispatched(err));
   }
 
   function processNewStateForPath(path, state) {

@@ -79,7 +79,7 @@ which is useful when metadata is needed or errors need custom handling.
 Arguments are `error, data, callback`. `callback` must be invoked with a potential error
 after custom handling is done.
 * `initialBatchDispatched` a function that is invoked once the initial set of
-data has been read from pouchdb and dispatched to the redux store.
+data has been read from pouchdb and dispatched to the redux store or if the data fails to be read from pouchdb it is called with an error.
 This comes handy if you want skip the initial updates to a store
 subscriber by delaying the subscription to the redux store
 until the initial state is present. For example, when your application is first
