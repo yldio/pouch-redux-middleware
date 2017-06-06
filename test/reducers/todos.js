@@ -1,70 +1,67 @@
-var actionTypes = require('../_action_types');
+'use strict';
 
-const initialState = []
+const actionTypes = require('../_action_types');
+
+const initialState = [];
+
+function id() {
+  return Math.random().toString(36).substring(7);
+}
 
 module.exports = function todos(state, action) {
-  if (! state) {
-    state = [];
-  }
-
+  if (!state) return initialState;
   switch (action.type) {
     case actionTypes.ADD_TODO:
       return [
         {
           _id: action.id || id(),
           completed: false,
-          text: action.text
+          text: action.text,
         },
-        ...state
-      ]
+        ...state,
+      ];
 
     case actionTypes.INSERT_TODO:
-      return [
-        action.todo,
-        ...state
-      ]
+      return [action.todo, ...state];
     case actionTypes.BATCH_INSERT_TODOS:
-      return [...state, ...action.todos]
+      return [...state, ...action.todos];
     case actionTypes.DELETE_TODO:
-      return state.filter(todo =>
-        todo._id !== action.id
-      )
+      return state.filter(todo => todo._id !== action.id);
 
     case actionTypes.EDIT_TODO:
-      return state.map(todo =>
-        todo._id === action.id ?
-          Object.assign({}, todo, { text: action.text }) :
-          todo
-      )
+      return state.map(
+        todo =>
+          todo._id === action.id
+            ? Object.assign({}, todo, { text: action.text })
+            : todo
+      );
 
     case actionTypes.UPDATE_TODO:
-      return state.map(todo =>
-        todo._id === action.todo._id ?
-          action.todo :
-          todo
-      )
+      return state.map(
+        todo => (todo._id === action.todo._id ? action.todo : todo)
+      );
 
     case actionTypes.COMPLETE_TODO:
-      return state.map(todo =>
-        todo._id === action.id ?
-          Object.assign({}, todo, { completed: !todo.completed }) :
-          todo
-      )
+      return state.map(
+        todo =>
+          todo._id === action.id
+            ? Object.assign({}, todo, { completed: !todo.completed })
+            : todo
+      );
 
-    case actionTypes.COMPLETE_ALL:
-      const areAllMarked = state.every(todo => todo.completed)
-      return state.map(todo => Object.assign({}, todo, {
-        completed: !areAllMarked
-      }))
+    case actionTypes.COMPLETE_ALL: {
+      const areAllMarked = state.every(todo => todo.completed);
+      return state.map(todo =>
+        Object.assign({}, todo, {
+          completed: !areAllMarked,
+        })
+      );
+    }
 
     case actionTypes.CLEAR_COMPLETED:
-      return state.filter(todo => todo.completed === false)
+      return state.filter(todo => todo.completed === false);
 
     default:
-      return state
+      return state;
   }
-}
-
-function id() {
-  return Math.random().toString(36).substring(7);
-}
+};
