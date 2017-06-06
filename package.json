@@ -4,8 +4,10 @@
   "description": "PouchDB Redux Middleware",
   "main": "lib/index.js",
   "scripts": {
-    "test": "npm run build && npm run test:node",
+    "test": "npm run lint && npm run build && npm run test:node",
     "test:node": "node --harmony node_modules/istanbul/lib/cli.js cover -- lab -vl && istanbul check-coverage",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
     "prepublish": "npm run build",
     "build": "babel ./src -d lib"
   },

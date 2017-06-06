@@ -1,3 +1,5 @@
+'use strict';
+
 [
   'ERROR',
   'ADD_TODO',
@@ -8,7 +10,7 @@
   'UPDATE_TODO',
   'COMPLETE_TODO',
   'COMPLETE_ALL',
-  'CLEAR_COMPLETED'
-].forEach(function(type) {
-  exports[type]  = type;
+  'CLEAR_COMPLETED',
+].forEach(type => {
+  exports[type] = type;
 });

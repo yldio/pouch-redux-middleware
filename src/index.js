@@ -191,14 +191,12 @@ function createPouchMiddleware(_paths) {
 
   const defaultSpec = {
     path: '.',
-    /* eslint-disable no-use-before-define */
     remove: scheduleRemove,
     insert: scheduleInsert,
     propagateDelete,
     propagateUpdate,
     propagateInsert,
     propagateBatchInsert,
-    /* eslint-enable no-use-before-define */
     handleResponse(err, data, cb) {
       cb(err);
     },
