@@ -45,6 +45,26 @@ function createPouchMiddleware(_paths) {
     return spec;
   });
 
+  var subscriptions = [];
+  function subscribeToChanges(db){
+    var found = subscriptions.find(function(subDb) {
+      return subDb.db === db
+    });
+
+    if (found != null){
+      return found.changes;
+    }
+
+    var changes = db.changes({
+      live: true,
+      include_docs: true,
+      since: 'now',
+    });
+
+    subscriptions.push({ db: db, changes: changes});
+    return changes;
+  }
+
   function listen(path, dispatch, initialBatchDispatched) {
     path.db.allDocs({ include_docs: true }).then((rawAllDocs) => {
       var allDocs = rawAllDocs.rows.map((doc) => doc.doc);
@@ -57,11 +77,7 @@ function createPouchMiddleware(_paths) {
       });
       path.propagateBatchInsert(filteredAllDocs, dispatch);
       initialBatchDispatched();
-      var changes = path.db.changes({
-        live: true,
-        include_docs: true,
-        since: 'now',
-      });
+      var changes = subscribeToChanges(path.db);
       changes.on('change', change => {
         onDbChange(path, change, dispatch);
       });
