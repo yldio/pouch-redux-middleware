@@ -3,7 +3,17 @@ var Queue = require('async-function-queue');
 var extend = require('xtend');
 var equal = require('deep-equal');
 
-module.exports = createPouchMiddleware;
+
+module.exports = {
+  create: createPouchMiddleware,
+  setDb: setPouchMiddlewareDb
+}
+
+const POUCH_REDUX_MIDDLEWARE_DB_READY = 'POUCH_REDUX_MIDDLEWARE_DB_READY'
+
+function setPouchMiddlewareDb (name, db) {
+  return { type: POUCH_REDUX_MIDDLEWARE_DB_READY, name, db }
+}
 
 function createPouchMiddleware(_paths) {
   var paths = _paths || [];
@@ -141,11 +151,13 @@ function createPouchMiddleware(_paths) {
 
   return function(options) {
     paths.forEach((path) => {
-      listen(path, options.dispatch, (err) => {
-        if (path.initialBatchDispatched) {
-          path.initialBatchDispatched(err);
-        }
-      });
+      if(typeof(path.db) === 'object') {
+        listen(path, options.dispatch, (err) => {
+          if (path.initialBatchDispatched) {
+            path.initialBatchDispatched(err);
+          }
+        });
+      }
     });
 
     return function(next) {
@@ -153,7 +165,24 @@ function createPouchMiddleware(_paths) {
         var returnValue = next(action);
         var newState = options.getState();
 
-        paths.forEach(path => processNewStateForPath(path, newState));
+        paths.forEach((path) => {
+          if(typeof(path.db) === 'object') {
+            return processNewStateForPath(path, newState)
+          } else {
+            if(path.db === action.name &&
+              action.type === DYNAMIC_POUCH_REDUX_MIDDLEWARE_DB_READY) {
+              path.db = action.db
+              if(typeof(path.db) === 'object') {
+                listen(path, options.dispatch, function (err) {
+                  if (path.initialBatchDispatched) {
+                    path.initialBatchDispatched(err)
+                  }
+                })
+              }
+            }
+          }
+          processNewStateForPath(path, newState)
+        });
 
         return returnValue;
       }

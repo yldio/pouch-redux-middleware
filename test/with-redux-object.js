@@ -27,7 +27,7 @@ describe('Pouch Redux Middleware with Objects', function() {
 
   it('todosmaps can be created', function(done) {
 
-    pouchMiddleware = PouchMiddleware({
+    pouchMiddleware = PouchMiddleware.create({
       path: '/todosobject',
       db: db,
       actions: {

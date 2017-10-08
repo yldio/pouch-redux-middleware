@@ -20,15 +20,26 @@ describe('Pouch Redux Middleware', function() {
 
   it('cannot be created with no paths', function(done) {
     expect(function() {
-      PouchMiddleware();
+      PouchMiddleware.create();
     }).to.throw('PouchMiddleware: no paths');
     done();
   });
 
   it('requires db in path', function(done) {
     expect(function() {
-      PouchMiddleware([{}]);
+      PouchMiddleware.create([{}]);
     }).to.throw('path undefined needs a db');
     done();
   });
+
+  it('db in path can be a string', function(done) {
+    expect(function() {
+      PouchMiddleware.create([{
+        path: '/todos',
+        db: 'todos'
+      }]);
+    }).to.not.throw();
+    done();
+  });
+
 });
