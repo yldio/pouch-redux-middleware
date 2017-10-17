@@ -151,7 +151,7 @@ function createPouchMiddleware(_paths) {
 
   return function(options) {
     paths.forEach((path) => {
-      if(typeof(path.db) === 'object') {
+      if(path.db) {
         listen(path, options.dispatch, (err) => {
           if (path.initialBatchDispatched) {
             path.initialBatchDispatched(err);
