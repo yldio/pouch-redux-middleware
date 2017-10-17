@@ -27,7 +27,7 @@ describe('Pouch Redux Middleware', function() {
 
   it('can be created', function(done) {
 
-    pouchMiddleware = PouchMiddleware({
+    pouchMiddleware = PouchMiddleware.create({
       path: '/todos',
       db: db,
       actions: {
@@ -165,7 +165,7 @@ describe('Pouch Redux Middleware', function() {
   });
 
   it('calls initialBatchDispatched', (done) => {
-    const anotherMiddleware = PouchMiddleware({
+    const anotherMiddleware = PouchMiddleware.create({
       path: '/todos',
       db: db,
       actions: {
@@ -197,7 +197,7 @@ describe('Pouch Redux Middleware', function() {
     expect(store.getState().todos.length).to.equal(0);
   });
   it('calls initialBatchDispatched with an error if db.allDocs throws', (done) => {
-    const anotherMiddleware = PouchMiddleware({
+    const anotherMiddleware = PouchMiddleware.create({
       path: '/todos',
       db: ({ allDocs: () => Promise.reject(new Error('Some PouchDB error')) }),
       actions: {
