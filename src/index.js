@@ -9,10 +9,10 @@ module.exports = {
   setDb: setPouchMiddlewareDb
 }
 
-const POUCH_REDUX_MIDDLEWARE_DB_READY = 'POUCH_REDUX_MIDDLEWARE_DB_READY'
+const DYNAMIC_POUCH_REDUX_MIDDLEWARE_SET_DB = 'DYNAMIC_POUCH_REDUX_MIDDLEWARE_SET_DB'
 
 function setPouchMiddlewareDb (name, db) {
-  return { type: POUCH_REDUX_MIDDLEWARE_DB_READY, name, db }
+  return { type: DYNAMIC_POUCH_REDUX_MIDDLEWARE_SET_DB, name, db }
 }
 
 function createPouchMiddleware(_paths) {
@@ -49,7 +49,7 @@ function createPouchMiddleware(_paths) {
     spec.actions = extend({}, defaultSpec.actions, spec.actions);
     spec.docs = {};
 
-    if (! spec.db) {
+    if (!spec.db && !spec.name) {
       throw new Error('path ' + path.path + ' needs a db');
     }
     return spec;
@@ -166,22 +166,18 @@ function createPouchMiddleware(_paths) {
         var newState = options.getState();
 
         paths.forEach((path) => {
-          if(typeof(path.db) === 'object') {
-            return processNewStateForPath(path, newState)
-          } else {
-            if(path.db === action.name &&
-              action.type === DYNAMIC_POUCH_REDUX_MIDDLEWARE_DB_READY) {
-              path.db = action.db
-              if(typeof(path.db) === 'object') {
-                listen(path, options.dispatch, function (err) {
-                  if (path.initialBatchDispatched) {
-                    path.initialBatchDispatched(err)
-                  }
-                })
-              }
+          if (action.type === DYNAMIC_POUCH_REDUX_MIDDLEWARE_SET_DB && path.name === action.name) {
+            path.db = action.db;
+            if (path.db) {
+              listen(path, options.dispatch, function (err) {
+                if (path.initialBatchDispatched) {
+                  path.initialBatchDispatched(err);
+                }
+              })
             }
+          } else {
+            return processNewStateForPath(path, newState)
           }
-          processNewStateForPath(path, newState)
         });
 
         return returnValue;

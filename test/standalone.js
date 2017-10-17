@@ -32,11 +32,12 @@ describe('Pouch Redux Middleware', function() {
     done();
   });
 
-  it('db in path can be a string', function(done) {
+  it('db can be null as long as there is name property', function(done) {
     expect(function() {
       PouchMiddleware.create([{
         path: '/todos',
-        db: 'todos'
+        db: null,
+        name: 'todos'
       }]);
     }).to.not.throw();
     done();
